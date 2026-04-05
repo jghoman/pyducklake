@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyducklake"
-version = "1.0.0"
+version = "1.0.1"
 description = "A Python library for Ducklake, providing a pyiceberg-like API"
 requires-python = ">=3.10"
 dependencies = [
@@ -39,6 +39,9 @@ dev = [
 
 [project.scripts]
 pyducklake = "pyducklake.cli:cli"
+
+[tool.hatch.build]
+exclude = [".flox"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyducklake"]

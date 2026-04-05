@@ -1,0 +1,148 @@
+services:
+  postgres-source:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ducklake
+      POSTGRES_PASSWORD: ducklake
+      POSTGRES_DB: ducklake
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ducklake"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ducklake-net
+
+  postgres-123:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ducklake
+      POSTGRES_PASSWORD: ducklake
+      POSTGRES_DB: ducklake
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ducklake"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ducklake-net
+
+  postgres-456:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ducklake
+      POSTGRES_PASSWORD: ducklake
+      POSTGRES_DB: ducklake
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ducklake"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ducklake-net
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ducklake-net
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin &&
+      mc mb --ignore-existing local/source &&
+      mc mb --ignore-existing local/team-123 &&
+      mc mb --ignore-existing local/team-456 &&
+      echo 'Buckets created successfully'
+      "
+    networks:
+      - ducklake-net
+
+  producer:
+    build:
+      context: ../..
+      dockerfile: examples/table_replication/Dockerfile
+    command: python producer.py
+    environment: &s3env
+      S3_ENDPOINT: minio:9000
+      S3_ACCESS_KEY_ID: minioadmin
+      S3_SECRET_ACCESS_KEY: minioadmin
+      S3_USE_SSL: "false"
+      S3_URL_STYLE: path
+    depends_on:
+      postgres-source:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    restart: on-failure
+    networks:
+      - ducklake-net
+
+  router:
+    build:
+      context: ../..
+      dockerfile: examples/table_replication/Dockerfile
+    command: python router.py
+    environment:
+      <<: *s3env
+    depends_on:
+      producer:
+        condition: service_started
+      postgres-123:
+        condition: service_healthy
+      postgres-456:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - ducklake-net
+
+  reader-123:
+    build:
+      context: ../..
+      dockerfile: examples/table_replication/Dockerfile
+    command: python reader.py
+    environment:
+      <<: *s3env
+      DUCKLAKE_POSTGRES: "postgres:dbname=ducklake host=postgres-123 user=ducklake password=ducklake"
+      DUCKLAKE_S3_BUCKET: team-123
+      TEAM_ID: "123"
+    depends_on:
+      router:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - ducklake-net
+
+  reader-456:
+    build:
+      context: ../..
+      dockerfile: examples/table_replication/Dockerfile
+    command: python reader.py
+    environment:
+      <<: *s3env
+      DUCKLAKE_POSTGRES: "postgres:dbname=ducklake host=postgres-456 user=ducklake password=ducklake"
+      DUCKLAKE_S3_BUCKET: team-456
+      TEAM_ID: "456"
+    depends_on:
+      router:
+        condition: service_started
+    restart: on-failure
+    networks:
+      - ducklake-net
+
+networks:
+  ducklake-net:
+    driver: bridge

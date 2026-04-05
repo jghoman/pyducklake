@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pyducklake"
+version = "1.0.0"
+description = "A Python library for Ducklake, providing a pyiceberg-like API"
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.0,<9",
+    "duckdb>=1.4,<2",
+    "pyarrow>=18.0,<24",
+]
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+polars = ["polars>=0.20"]
+ray = ["ray[data]>=2.0"]
+all = ["pandas>=2.0", "polars>=0.20", "ray[data]>=2.0"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "mypy>=1.10",
+    "ruff>=0.8",
+    "pyright>=1.1",
+    "testcontainers>=4.14.2",
+    "psycopg2-binary>=2.9.11",
+    "minio>=7.2.20",
+    "pymysql>=1.1.2",
+    "cryptography>=46.0.6",
+    "pdoc>=16.0.0",
+    "pyarrow-stubs>=18.0",
+    "pandas>=2.0",
+    "pytz>=2026.1.post1",
+    "polars>=1.39.3",
+]
+
+[project.scripts]
+pyducklake = "pyducklake.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyducklake"]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pyright]
+pythonVersion = "3.10"
+typeCheckingMode = "strict"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: marks tests as integration tests",
+]

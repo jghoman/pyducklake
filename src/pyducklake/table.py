@@ -57,10 +57,13 @@ class Table:
         identifier: tuple[str, str],
         schema: Schema,
         catalog: Catalog,
+        *,
+        sort_order: SortOrder | None = None,
     ) -> None:
         self._identifier = identifier
         self._schema = schema
         self._catalog = catalog
+        self._sort_order_cache: SortOrder | None = sort_order
 
     @property
     def name(self) -> str:
@@ -140,6 +143,7 @@ class Table:
     def refresh(self) -> Table:
         """Reload schema and metadata from the catalog. Returns self."""
         self._schema = self._catalog.build_schema_from_describe(self._identifier[0], self._identifier[1])
+        self._sort_order_cache = None
         return self
 
     # -- Rollback --------------------------------------------------------------
@@ -530,6 +534,15 @@ class Table:
     @property
     def sort_order(self) -> SortOrder:
         """Current sort order. Returns UNSORTED if not sorted."""
+        if self._sort_order_cache is not None:
+            return self._sort_order_cache
+
+        result = self._fetch_sort_order()
+        self._sort_order_cache = result
+        return result
+
+    def _fetch_sort_order(self) -> SortOrder:
+        """Query DuckLake metadata for the current sort order."""
         from pyducklake.catalog import escape_string_literal
         from pyducklake.sorting import (
             UNSORTED,

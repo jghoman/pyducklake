@@ -315,7 +315,9 @@ class Catalog:
 
         # Reload schema from DuckDB to get canonical types
         loaded_schema = self.build_schema_from_describe(namespace, table_name)
-        return Table(identifier=(namespace, table_name), schema=loaded_schema, catalog=self)
+        from pyducklake.sorting import UNSORTED
+
+        return Table(identifier=(namespace, table_name), schema=loaded_schema, catalog=self, sort_order=UNSORTED)
 
     def create_table_if_not_exists(
         self,

@@ -301,11 +301,11 @@ class Table:
         If the table has a sort order, data is sorted before insertion.
         """
         arrow_table = self._to_arrow_table(df)
+        order = self._sort_order_clause()
         conn = self._catalog.connection
         conn.register("_pyducklake_tmp_append", arrow_table)
         try:
             fqn = self.fully_qualified_name
-            order = self._sort_order_clause()
             if order:
                 conn.execute(f"INSERT INTO {fqn} SELECT * FROM _pyducklake_tmp_append ORDER BY {order}")
             else:
@@ -335,11 +335,11 @@ class Table:
                 raise ValueError("schema is required when passing an iterator of RecordBatch")
             reader = pa.RecordBatchReader.from_batches(schema, batches)
 
+        order = self._sort_order_clause()
         conn = self._catalog.connection
         conn.register("_pyducklake_tmp_batches", reader)
         try:
             fqn = self.fully_qualified_name
-            order = self._sort_order_clause()
             if order:
                 conn.execute(f"INSERT INTO {fqn} SELECT * FROM _pyducklake_tmp_batches ORDER BY {order}")
             else:
@@ -365,6 +365,7 @@ class Table:
         an explicit :class:`Transaction` without nesting conflicts.
         """
         arrow_table = self._to_arrow_table(df)
+        order = self._sort_order_clause()
         conn = self._catalog.connection
         conn.register("_pyducklake_tmp_overwrite", arrow_table)
         try:
@@ -381,7 +382,6 @@ class Table:
             else:
                 conn.execute(f"DELETE FROM {fqn}")
 
-            order = self._sort_order_clause()
             if order:
                 conn.execute(f"INSERT INTO {fqn} SELECT * FROM _pyducklake_tmp_overwrite ORDER BY {order}")
             else:

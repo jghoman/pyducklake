@@ -1,0 +1,41 @@
+# .github/workflows/pip-audit.yml
+#
+# NOTE: Per supply chain security best practices, replace all @vX.Y.Z tags
+# with full 40-character commit SHAs. Find them at:
+#   actions/checkout:        https://github.com/actions/checkout/releases
+#   pypa/gh-action-pip-audit: https://github.com/pypa/gh-action-pip-audit/releases
+
+name: pip-audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run weekly so new CVEs against existing deps are caught
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    name: pip-audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Run pip-audit
+        uses: pypa/gh-action-pip-audit@1220774d901786e6f652ae159f7b6bc8fea6d266 # v1.1.0
+        with:
+          inputs: .

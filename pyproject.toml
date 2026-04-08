@@ -7,6 +7,24 @@ name = "pyducklake"
 readme = "README.md"
 version = "1.0.3"
 description = "A Python library for Ducklake, providing a pyiceberg-like API"
+license = "Apache-2.0"
+authors = [
+    { name = "Jakob Homan" },
+]
+keywords = ["ducklake", "lakehouse", "duckdb", "data-lake", "pyiceberg", "parquet"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering",
+    "Typing :: Typed",
+]
 requires-python = ">=3.10"
 dependencies = [
     "click>=8.0,<9",
@@ -40,6 +58,13 @@ dev = [
 
 [project.scripts]
 pyducklake = "pyducklake.cli:cli"
+
+[project.urls]
+Homepage = "https://github.com/jghoman/pyducklake"
+Repository = "https://github.com/jghoman/pyducklake"
+Issues = "https://github.com/jghoman/pyducklake/issues"
+Documentation = "https://jghoman.github.io/pyducklake/pyducklake.html"
+Changelog = "https://github.com/jghoman/pyducklake/releases"
 
 [tool.hatch.build]
 exclude = [".flox"]

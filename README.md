@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/pyducklake)](https://pypi.org/project/pyducklake/)
 [![Downloads](https://static.pepy.tech/badge/pyducklake)](https://pepy.tech/project/pyducklake)
 [![Patches welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](https://github.com/jghoman/pyducklake/pulls)
-[![GitHub Actions Security Analysis with zizmor 🌈](https://github.com/jghoman/pyducklake/actions/workflows/zizmor.yml/badge.svg)](https://github.com/jghoman/pyducklake/actions/workflows/zizmor.yml)
+[![GitHub Actions Security Analysis with zizmor 🌈](https://github.com/jghoman/pyducklake/actions/workflows/zizmor.yml/badge.svg)](https://github.com/jghoman/pyducklake/actions/workflows/zizmor.yml)[![Dependabot Updates](https://github.com/jghoman/pyducklake/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/jghoman/pyducklake/actions/workflows/dependabot/dependabot-updates)
 
 A Python SDK for [Ducklake](https://ducklake.select), providing a [pyiceberg](https://py.iceberg.apache.org/)-like API for the Ducklake lakehouse format.
 

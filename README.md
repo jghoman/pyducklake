@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/pypi/pyversions/pyducklake)](https://pypi.org/project/pyducklake/)
 [![Downloads](https://static.pepy.tech/badge/pyducklake)](https://pepy.tech/project/pyducklake)
+[![Patches welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
 A Python SDK for [Ducklake](https://ducklake.select), providing a [pyiceberg](https://py.iceberg.apache.org/)-like API for the Ducklake lakehouse format.
 

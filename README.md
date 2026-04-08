@@ -1,7 +1,7 @@
 # pyducklake
 
 [![PyPI version](https://img.shields.io/pypi/v/pyducklake)](https://pypi.org/project/pyducklake/)
-[![CI](https://img.shields.io/github/actions/workflow/status/your-org/pyducklake/ci.yml?branch=main&label=CI)](https://github.com/your-org/pyducklake/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/jghoman/pyducklake/ci.yml?branch=main&label=CI)](https://github.com/jghoman/pyducklake/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/pypi/pyversions/pyducklake)](https://pypi.org/project/pyducklake/)
 

@@ -44,7 +44,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync
-      - run: uv run python -m pytest tests/ --ignore=tests/integration -q --tb=short
+      - run: uv run python -m pytest tests/ --ignore=tests/integration -q --tb=short --cov=pyducklake --cov-report=xml
+      - if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5
+        with:
+          files: coverage.xml
 
   integration:
     runs-on: ubuntu-latest

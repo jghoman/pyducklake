@@ -12,4 +12,4 @@ updates:
   - package-ecosystem: docker
     directory: /examples/table_replication
     schedule:
-      interval: daily
+      interval: weekly

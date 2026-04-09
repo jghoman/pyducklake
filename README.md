@@ -523,6 +523,10 @@ just build             # build wheel + sdist
 just docs              # generate API docs
 ```
 
+## Roadmap
+
+- Property-based testing with [Hypothesis](https://hypothesis.readthedocs.io/)
+
 ## License
 
 Apache License 2.0

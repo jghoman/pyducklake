@@ -55,6 +55,9 @@ dev = [
     "pytz>=2026.1.post1",
     "polars>=1.39.3",
     "hypothesis>=6.151.12",
+    "pytest-cov>=7.1.0",
+    "pytest-benchmark>=5.2.3",
+    "pytest-randomly>=4.0.1",
 ]
 
 [project.scripts]

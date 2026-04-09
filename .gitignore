@@ -15,6 +15,7 @@ build/
 .pytest_cache/
 .mypy_cache/
 .hypothesis/
+.coverage
 
 # IDE
 .idea/

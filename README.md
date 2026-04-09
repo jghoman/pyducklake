@@ -525,7 +525,7 @@ just docs              # generate API docs
 
 ## Roadmap
 
-- Property-based testing with [Hypothesis](https://hypothesis.readthedocs.io/)
+- Expand [Hypothesis](https://hypothesis.readthedocs.io/) property-based test coverage
 
 ## License
 

@@ -2,6 +2,7 @@
 
 ## Development Principles
 - **TDD**: Write tests first. All new code must have corresponding tests.
+- **Property-based testing**: New features should include Hypothesis property-based tests in `tests/test_hypothesis.py` when feasible. Use the existing strategies (`arrow_tables_for_schema`, `boolean_expressions`) and `_fresh_catalog()` helper. Good candidates: any operation with invariants (row counts, round-trips, algebraic laws, accounting identities).
 - **Static typing**: Use type annotations everywhere. Code must pass mypy strict mode and pyright strict mode.
 
 ## Tooling
@@ -11,6 +12,7 @@
 - **ruff** for linting and formatting
 - **mypy** + **pyright** for type checking
 - **pytest** for testing
+- **hypothesis** for property-based testing
 
 ## Workflow
 - Run `just ci` for the full check suite (format, lint, typecheck, test).

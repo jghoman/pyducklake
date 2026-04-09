@@ -2,9 +2,131 @@
   "lockfile-version": 1,
   "manifest": {
     "schema-version": "1.11.0",
+    "install": {
+      "gitleaks": {
+        "pkg-path": "gitleaks"
+      }
+    },
     "hook": {},
     "profile": {},
     "options": {}
   },
-  "packages": []
+  "packages": [
+    {
+      "attr_path": "gitleaks",
+      "broken": false,
+      "derivation": "/nix/store/z3pjgwj5137dh39wvsd6y62cnji1rhzj-gitleaks-8.30.1.drv",
+      "description": "Scan git repos (or files) for secrets",
+      "install_id": "gitleaks",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "name": "gitleaks-8.30.1",
+      "pname": "gitleaks",
+      "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "rev_count": 975402,
+      "rev_date": "2026-04-05T21:03:29Z",
+      "scrape_date": "2026-04-07T06:03:33.016571Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.30.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/fxhd0r0aj895z008vfxdmnm6c53f6d1c-gitleaks-8.30.1"
+      },
+      "system": "aarch64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gitleaks",
+      "broken": false,
+      "derivation": "/nix/store/gd9wx8ih72s333gqr74b6vgb2b2rmygs-gitleaks-8.30.1.drv",
+      "description": "Scan git repos (or files) for secrets",
+      "install_id": "gitleaks",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "name": "gitleaks-8.30.1",
+      "pname": "gitleaks",
+      "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "rev_count": 975402,
+      "rev_date": "2026-04-05T21:03:29Z",
+      "scrape_date": "2026-04-07T06:34:58.180369Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.30.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/jw074cwmpaz8c7sr696hvhiqa1h49plm-gitleaks-8.30.1"
+      },
+      "system": "aarch64-linux",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gitleaks",
+      "broken": false,
+      "derivation": "/nix/store/wlj0ha6s4b23rpx5fss3wc4cci1p9ja7-gitleaks-8.30.1.drv",
+      "description": "Scan git repos (or files) for secrets",
+      "install_id": "gitleaks",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "name": "gitleaks-8.30.1",
+      "pname": "gitleaks",
+      "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "rev_count": 975402,
+      "rev_date": "2026-04-05T21:03:29Z",
+      "scrape_date": "2026-04-07T07:05:00.762169Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.30.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/hldm78zrvjg00f0ygdsya5885pwxm2vy-gitleaks-8.30.1"
+      },
+      "system": "x86_64-darwin",
+      "group": "toplevel",
+      "priority": 5
+    },
+    {
+      "attr_path": "gitleaks",
+      "broken": false,
+      "derivation": "/nix/store/gpjw7ps00j4j0igxifvqja2645a4zwax-gitleaks-8.30.1.drv",
+      "description": "Scan git repos (or files) for secrets",
+      "install_id": "gitleaks",
+      "license": "MIT",
+      "locked_url": "https://github.com/flox/nixpkgs?rev=68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "name": "gitleaks-8.30.1",
+      "pname": "gitleaks",
+      "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+      "rev_count": 975402,
+      "rev_date": "2026-04-05T21:03:29Z",
+      "scrape_date": "2026-04-07T07:39:07.903194Z",
+      "stabilities": [
+        "unstable"
+      ],
+      "unfree": false,
+      "version": "8.30.1",
+      "outputs_to_install": [
+        "out"
+      ],
+      "outputs": {
+        "out": "/nix/store/rsrbs4p46m57c0c19adh4b5n2ianvf2x-gitleaks-8.30.1"
+      },
+      "system": "x86_64-linux",
+      "group": "toplevel",
+      "priority": 5
+    }
+  ]
 }

@@ -41,10 +41,16 @@ typecheck:
 typecheck-pyright:
     uv run pyright src/
 
+# Scan for leaked secrets
+[group('dev')]
+secrets-scan:
+    gitleaks detect --verbose
+
 # Audit dependencies for known vulnerabilities
 [group('dev')]
 audit:
     uv audit
+    just secrets-scan
 
 # === Test ===
 

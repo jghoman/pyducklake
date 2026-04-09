@@ -211,7 +211,28 @@ class Table:
         snapshot_id: int | None = None,
         limit: int | None = None,
     ) -> DataScan:
-        """Create a scan on this table."""
+        """Create a scan on this table.
+
+        Examples:
+
+        ```pycon
+        >>> import tempfile, os, pyarrow as pa
+        >>> from pyducklake import Catalog, Schema, required, optional, IntegerType, StringType
+        >>> tmp = tempfile.mkdtemp()
+        >>> cat = Catalog("t", os.path.join(tmp, "m.duckdb"), data_path=os.path.join(tmp, "d"))
+        >>> table = cat.create_table("users", Schema.of(
+        ...     required("id", IntegerType()), optional("name", StringType()),
+        ... ))
+        >>> table.append(pa.table({"id": [1, 2, 3], "name": ["alice", "bob", "carol"]}))
+        >>> table.scan().count()
+        3
+        >>> table.scan().select("name").to_arrow().column("name").to_pylist()
+        ['alice', 'bob', 'carol']
+        >>> table.scan('"id" > 1').count()
+        2
+
+        ```
+        """
         from pyducklake.scan import DataScan, RawSQL
 
         if isinstance(row_filter, str):
@@ -303,6 +324,21 @@ class Table:
         PyCapsule interface (``__arrow_c_stream__``).
 
         If the table has a sort order, data is sorted before insertion.
+
+        Examples:
+
+        ```pycon
+        >>> import tempfile, os, pyarrow as pa
+        >>> from pyducklake import Catalog, Schema, required, IntegerType
+        >>> tmp = tempfile.mkdtemp()
+        >>> cat = Catalog("t", os.path.join(tmp, "m.duckdb"), data_path=os.path.join(tmp, "d"))
+        >>> table = cat.create_table("nums", Schema.of(required("n", IntegerType())))
+        >>> table.append(pa.table({"n": [1, 2, 3]}))
+        >>> table.append(pa.table({"n": [4, 5]}))
+        >>> table.scan().count()
+        5
+
+        ```
         """
         arrow_table = self._to_arrow_table(df)
         order = self._sort_order_clause()

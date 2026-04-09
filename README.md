@@ -517,7 +517,8 @@ just test              # unit tests
 just test-integration  # integration tests (Docker required)
 just ci                # lint + typecheck + test
 just fmt               # format code
-just typecheck         # mypy strict
+just typecheck         # mypy + pyright
+just typecheck-mypy    # mypy strict
 just typecheck-pyright # pyright strict
 just audit             # dependency vulnerability scan
 just build             # build wheel + sdist

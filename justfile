@@ -6,6 +6,12 @@ default:
 
 # === Dev ===
 
+# Install dependencies and configure git hooks
+[group('dev')]
+setup:
+    uv sync
+    git config core.hooksPath .githooks
+
 # Install dependencies
 [group('dev')]
 sync:
@@ -31,9 +37,13 @@ lint:
 lint-fix:
     uv run ruff check --fix src/ tests/
 
+# Run all type checkers (mypy + pyright)
+[group('dev')]
+typecheck: typecheck-mypy typecheck-pyright
+
 # Type check with mypy
 [group('dev')]
-typecheck:
+typecheck-mypy:
     uv run mypy src/
 
 # Type check with pyright

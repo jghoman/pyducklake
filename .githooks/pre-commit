@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! command -v gitleaks &>/dev/null; then
+    echo "gitleaks not found."
+    echo "Run 'flox activate' to enter the dev environment, or install gitleaks manually."
+    exit 1
+fi
+
+echo "Running gitleaks pre-commit scan..."
+gitleaks protect --staged --verbose

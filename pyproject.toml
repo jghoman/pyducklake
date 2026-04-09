@@ -54,6 +54,7 @@ dev = [
     "pandas>=2.0",
     "pytz>=2026.1.post1",
     "polars>=1.39.3",
+    "hypothesis>=6.151.12",
 ]
 
 [project.scripts]

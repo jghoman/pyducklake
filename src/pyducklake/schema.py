@@ -30,11 +30,15 @@ def required(name: str, field_type: DucklakeType, doc: str | None = None) -> Nes
         doc: Optional documentation string.
 
     Example:
-        >>> from pyducklake import Schema, required, optional, IntegerType, StringType
-        >>> schema = Schema.of(
-        ...     required("id", IntegerType()),
-        ...     optional("name", StringType()),
-        ... )
+
+    ```pycon
+    >>> from pyducklake import Schema, required, optional, IntegerType, StringType
+    >>> schema = Schema.of(
+    ...     required("id", IntegerType()),
+    ...     optional("name", StringType()),
+    ... )
+
+    ```
     """
     return NestedField(field_id=_SENTINEL_FIELD_ID, name=name, field_type=field_type, required=True, doc=doc)
 
@@ -51,10 +55,17 @@ def optional(name: str, field_type: DucklakeType, doc: str | None = None) -> Nes
         doc: Optional documentation string.
 
     Example:
-        >>> schema = Schema.of(
-        ...     required("id", IntegerType()),
-        ...     optional("name", StringType()),
-        ... )
+
+    ```pycon
+    >>> from pyducklake import Schema, required, optional, IntegerType, StringType
+    >>> schema = Schema.of(
+    ...     required("id", IntegerType()),
+    ...     optional("name", StringType()),
+    ... )
+    >>> schema.column_names()
+    ['id', 'name']
+
+    ```
     """
     return NestedField(field_id=_SENTINEL_FIELD_ID, name=name, field_type=field_type, required=False, doc=doc)
 
@@ -96,19 +107,30 @@ class Schema:
         :func:`optional`) or a single *dict* mapping column names to types.
 
         Examples:
-            Using ``required()`` and ``optional()`` helpers::
+            Using ``required()`` and ``optional()`` helpers:
 
-                schema = Schema.of(
-                    required("id", IntegerType()),
-                    optional("name", StringType()),
-                    optional("value", DoubleType()),
-                )
+            ```pycon
+            >>> from pyducklake import Schema, required, optional, IntegerType, StringType, DoubleType
+            >>> schema = Schema.of(
+            ...     required("id", IntegerType()),
+            ...     optional("name", StringType()),
+            ...     optional("value", DoubleType()),
+            ... )
+            >>> schema.column_names()
+            ['id', 'name', 'value']
+            >>> schema.find_field("id").required
+            True
 
-            Using a dict (all fields optional by default)::
+            ```
 
-                schema = Schema.of({"id": IntegerType(), "name": StringType()})
+            Using a dict (all fields optional by default):
 
-            Mix is not allowed — either all NestedField or a single dict.
+            ```pycon
+            >>> schema = Schema.of({"id": IntegerType(), "name": StringType()})
+            >>> schema.column_names()
+            ['id', 'name']
+
+            ```
 
         Args:
             *args: Either NestedField objects or a single dict[str, DucklakeType].

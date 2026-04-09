@@ -192,7 +192,19 @@ def escape_string_literal(value: str) -> str:
 
 
 class Catalog:
-    """Ducklake catalog backed by DuckDB + ducklake extension."""
+    """Ducklake catalog backed by DuckDB + ducklake extension.
+
+    Examples:
+
+    ```pycon
+    >>> import tempfile, os
+    >>> tmp = tempfile.mkdtemp()
+    >>> cat = Catalog("my_lake", os.path.join(tmp, "meta.duckdb"), data_path=os.path.join(tmp, "data"))
+    >>> cat.name
+    'my_lake'
+
+    ```
+    """
 
     def __init__(
         self,
@@ -300,7 +312,24 @@ class Catalog:
         identifier: str | tuple[str, str],
         schema: Schema,
     ) -> Table:
-        """CREATE TABLE with the given schema. Raises TableAlreadyExistsError if exists."""
+        """CREATE TABLE with the given schema. Raises TableAlreadyExistsError if exists.
+
+        Examples:
+
+        ```pycon
+        >>> import tempfile, os
+        >>> from pyducklake import Catalog, Schema, required, optional, IntegerType, StringType
+        >>> tmp = tempfile.mkdtemp()
+        >>> cat = Catalog("test", os.path.join(tmp, "m.duckdb"), data_path=os.path.join(tmp, "d"))
+        >>> schema = Schema.of(required("id", IntegerType()), optional("name", StringType()))
+        >>> table = cat.create_table("users", schema)
+        >>> table.name
+        'users'
+        >>> [f.name for f in table.schema.fields]
+        ['id', 'name']
+
+        ```
+        """
         namespace, table_name = self._resolve_identifier(identifier)
 
         if self.table_exists((namespace, table_name)):

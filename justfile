@@ -59,6 +59,16 @@ audit:
 test:
     uv run python -m pytest tests/ --ignore=tests/integration
 
+# Run unit tests with coverage
+[group('test')]
+test-cov:
+    uv run python -m pytest tests/ --ignore=tests/integration --cov=pyducklake --cov-report=term-missing
+
+# Run benchmarks
+[group('test')]
+bench:
+    uv run python -m pytest tests/ --ignore=tests/integration -k benchmark --benchmark-only
+
 # Run integration tests (requires Docker)
 [group('test')]
 test-integration:

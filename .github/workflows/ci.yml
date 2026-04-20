@@ -16,7 +16,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv run ruff check src/ tests/
       - run: uv run ruff format --check src/ tests/
 
@@ -27,7 +27,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv run mypy src/
       - run: uv run pyright src/
 
@@ -43,7 +43,7 @@ jobs:
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
         with:
           python-version: ${{ matrix.python-version }}
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv run python -m pytest tests/ --ignore=tests/integration -q --tb=short --cov=pyducklake --cov-report=xml
       - if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
@@ -57,7 +57,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-      - run: uv sync
+      - run: uv sync --frozen
       - run: uv run python -m pytest tests/integration -m integration -q --tb=short
 
   audit:

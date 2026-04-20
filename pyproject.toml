@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "pyducklake"
 readme = "README.md"
-version = "1.0.7"
+version = "1.0.8"
 description = "A Python library for Ducklake, providing a pyiceberg-like API"
 license = "Apache-2.0"
 authors = [

@@ -146,7 +146,7 @@ class DataScan:
         """Execute scan and return PyArrow Table."""
         sql = self._build_sql()
         result = self._table.catalog.connection.execute(sql)
-        return result.fetch_arrow_table()
+        return result.to_arrow_table()
 
     def to_pandas(self) -> pd.DataFrame:
         """Execute scan and return pandas DataFrame.

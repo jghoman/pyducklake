@@ -827,6 +827,7 @@ class TestPartitioning:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.duckdb15
 class TestSorting:
     def test_set_sort_order(self, catalog: Catalog, simple_schema: Schema, request: pytest.FixtureRequest) -> None:
         _mysql_metadata_xfail(request)

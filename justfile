@@ -109,6 +109,49 @@ wheel:
 clean:
     rm -rf .venv dist *.egg-info __pycache__ src/pyducklake/__pycache__
 
+# === Release ===
+
+# Bump version, commit, tag, and push. Usage: just release patch|minor|major [--yes]
+[group('release')]
+release bump *flags:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # Parse current version
+    current=$(grep '^version' pyproject.toml | head -1 | sed 's/.*"\(.*\)"/\1/')
+    IFS='.' read -r major minor patch <<< "$current"
+
+    # Compute new version
+    case "{{bump}}" in
+        patch) patch=$((patch + 1)) ;;
+        minor) minor=$((minor + 1)); patch=0 ;;
+        major) major=$((major + 1)); minor=0; patch=0 ;;
+        *) echo "Usage: just release patch|minor|major [--yes]"; exit 1 ;;
+    esac
+    new="${major}.${minor}.${patch}"
+
+    echo "Current version: $current"
+    echo "New version:     $new"
+    echo ""
+
+    # Confirm unless --yes passed
+    if [[ " {{flags}} " != *" --yes "* ]]; then
+        read -rp "Proceed with release v${new}? [y/N] " confirm
+        [[ "$confirm" =~ ^[Yy]$ ]] || { echo "Aborted."; exit 1; }
+    fi
+
+    # Bump version in pyproject.toml
+    sed -i '' "s/^version = \"${current}\"/version = \"${new}\"/" pyproject.toml
+
+    # Commit, tag, push
+    git add pyproject.toml
+    git commit -m "Release v${new}"
+    git tag "v${new}"
+    git push origin main --tags
+
+    echo ""
+    echo "Released v${new} — workflow will build and publish to PyPI."
+
 # === Docs ===
 
 # Generate API documentation

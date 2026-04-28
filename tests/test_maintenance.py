@@ -172,6 +172,7 @@ def test_maintenance_method_returns_maintenance_table(table: Table) -> None:
     assert isinstance(m, MaintenanceTable)
 
 
+@pytest.mark.duckdb15
 def test_compact_max_compacted_files(table: Table) -> None:
     """compact with max_compacted_files param should not error."""
     for i in range(5):

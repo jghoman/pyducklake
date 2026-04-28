@@ -173,7 +173,7 @@ class DataScan:
         """Execute scan and return a streaming Arrow RecordBatchReader."""
         sql = self._build_sql()
         result = self._table.catalog.connection.execute(sql)
-        return result.to_arrow_reader()
+        return result.fetch_record_batch()
 
     def to_polars(self) -> pl.DataFrame:
         """Execute scan and return a Polars DataFrame.

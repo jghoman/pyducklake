@@ -25,6 +25,8 @@ from pyducklake.types import (
     TimestampType,
 )
 
+pytestmark = pytest.mark.duckdb15
+
 
 @pytest.fixture()
 def catalog(tmp_path: Path) -> Catalog:

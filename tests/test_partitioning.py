@@ -608,6 +608,7 @@ def test_update_spec_add_replaces_existing(table: Table) -> None:
     assert spec2.fields[0].transform == YEAR
 
 
+@pytest.mark.duckdb15
 def test_sorting_plus_partitioning(table: Table) -> None:
     """Setting both sort order and partition spec on the same table works."""
     table.update_spec().add_field("region").commit()

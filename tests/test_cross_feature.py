@@ -356,6 +356,7 @@ class TestDeleteUpsertLifecycle:
 
 
 class TestPartitioningInteractions:
+    @pytest.mark.duckdb15
     def test_sort_plus_partition(self, catalog: Catalog) -> None:
         table = catalog.create_table("part_sort", _dated_schema())
         table.update_spec().add_field("region").commit()

@@ -411,6 +411,7 @@ class TestS3Partitioning:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.duckdb15
 class TestS3Sorting:
     def test_s3_set_sort_order(self, s3_catalog: Catalog, simple_schema: Schema) -> None:
         tbl = s3_catalog.create_table("s3_sort_set", simple_schema)

@@ -35,8 +35,8 @@ dependencies = [
 [project.optional-dependencies]
 pandas = ["pandas>=2.0"]
 polars = ["polars>=0.20"]
-ray = ["ray[data]>=2.0"]
-all = ["pandas>=2.0", "polars>=0.20", "ray[data]>=2.0"]
+ray = ["ray[data]>=2.55.1"]
+all = ["pandas>=2.0", "polars>=0.20", "ray[data]>=2.55.1"]
 
 [dependency-groups]
 dev = [

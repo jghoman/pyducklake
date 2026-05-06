@@ -14,24 +14,39 @@ Self-contained, runnable examples demonstrating pyducklake features.
 | [maintenance/](maintenance/) | Compaction, snapshot expiration, file cleanup |
 | [encrypted_catalog/](encrypted_catalog/) | Parquet-level encryption for data at rest |
 | [postgres_backend/](postgres_backend/) | PostgreSQL as metadata backend (requires Docker) |
+| [table_replication/](table_replication/) | CDC-based replication: route events from a source Ducklake to downstream Ducklakes by `team_id` (requires Docker) |
+| [delta_replication/](delta_replication/) | Delta Lake → Ducklake replication via transaction log tailing (requires Docker) |
 
 ## Running
 
-All examples except `postgres_backend` run with zero external dependencies beyond pyducklake:
+All examples except those marked *(requires Docker)* run with zero external dependencies beyond pyducklake:
 
 ```bash
 # Run a single example
 uv run python examples/quickstart/quickstart.py
 
-# Run all examples (except postgres_backend)
+# Run all local examples
 just examples
 ```
 
-The `postgres_backend` example requires Docker:
+### Docker examples
+
+The `postgres_backend`, `table_replication`, and `delta_replication` examples require Docker:
 
 ```bash
+# PostgreSQL backend
 cd examples/postgres_backend
 docker compose up -d
 uv run python examples/postgres_backend/postgres_backend.py
+docker compose down -v
+
+# Table replication (Ducklake CDC)
+cd examples/table_replication
+docker compose up --build
+docker compose down -v
+
+# Delta Lake → Ducklake replication (log tailing)
+cd examples/delta_replication
+docker compose up --build
 docker compose down -v
 ```

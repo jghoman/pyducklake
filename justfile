@@ -143,8 +143,11 @@ release bump *flags:
     # Bump version in pyproject.toml
     sed -i '' "s/^version = \"${current}\"/version = \"${new}\"/" pyproject.toml
 
+    # Sync so uv.lock picks up the new version
+    uv sync
+
     # Commit, tag, push
-    git add pyproject.toml
+    git add pyproject.toml uv.lock
     git commit -m "Release v${new}"
     git tag "v${new}"
     git push origin main --tags

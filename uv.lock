@@ -1507,7 +1507,7 @@ wheels = [
 
 [[package]]
 name = "pyducklake"
-version = "1.0.14"
+version = "1.0.15"
 source = { editable = "." }
 dependencies = [
     { name = "click" },

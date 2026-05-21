@@ -280,7 +280,6 @@ class TestS3Upsert:
         row2 = data.filter(pa.compute.equal(data.column("id"), 2)).to_pydict()
         assert row2["name"] == ["B"]
 
-    @pytest.mark.xfail(reason="DuckDB MERGE with S3 storage may fail with HTTP 403", strict=False)
     def test_s3_upsert_preserves_unmatched(self, s3_catalog: Catalog, simple_schema: Schema) -> None:
         tbl = s3_catalog.create_table("s3_ups_keep", simple_schema)
         tbl.append(pa.table({"id": [1, 2, 3], "name": ["a", "b", "c"], "value": [1.0, 2.0, 3.0]}))

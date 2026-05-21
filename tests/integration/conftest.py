@@ -7,6 +7,7 @@ import time
 import uuid
 from collections.abc import Generator
 
+import duckdb
 import pytest
 from testcontainers.minio import MinioContainer
 from testcontainers.mysql import MySqlContainer
@@ -14,6 +15,17 @@ from testcontainers.postgres import PostgresContainer
 
 from pyducklake import Catalog, Schema
 from pyducklake.types import DoubleType, IntegerType, NestedField, StringType
+
+# DuckDB 1.5.2's mysql_scanner segfaults inside fetchall during simple metadata
+# reads (duckdb/duckdb-mysql upstream). Skip the mysql backend on affected
+# versions; remove this guard when upstream ships a fix.
+_DUCKDB_VERSION = tuple(int(p) for p in duckdb.__version__.split(".")[:3])
+_MYSQL_BROKEN = _DUCKDB_VERSION >= (1, 5, 2)
+_MYSQL_MARKS = (
+    [pytest.mark.skip(reason=f"DuckDB {duckdb.__version__} mysql_scanner segfaults in fetchall")]
+    if _MYSQL_BROKEN
+    else []
+)
 
 # ---------------------------------------------------------------------------
 # PostgreSQL
@@ -278,7 +290,14 @@ import atexit  # noqa: E402
 atexit.register(_stop_containers)
 
 
-@pytest.fixture(params=["duckdb", "postgres", "sqlite", "mysql"])
+@pytest.fixture(
+    params=[
+        "duckdb",
+        "postgres",
+        "sqlite",
+        pytest.param("mysql", marks=_MYSQL_MARKS),
+    ]
+)
 def catalog(request: pytest.FixtureRequest, tmp_path: os.PathLike[str]) -> Generator[Catalog, None, None]:
     """Parameterized catalog fixture — runs each test against all backends."""
     backend = request.param

@@ -21,6 +21,7 @@ from pyducklake.exceptions import (
     TableAlreadyExistsError,
     ViewAlreadyExistsError,
 )
+from pyducklake.profiling import AppendProfiler, split_append_profile_properties
 from pyducklake.schema import Schema
 from pyducklake.table import Table
 from pyducklake.types import (
@@ -219,12 +220,13 @@ class Catalog:
         self._uri = uri
         self._data_path = data_path
         self._encrypted = encrypted
+        connection_properties, self._append_profiler = split_append_profile_properties(properties)
 
         self._conn = duckdb.connect()
         self._conn.execute("INSTALL ducklake; LOAD ducklake;")
 
         # Apply connection properties (e.g., S3 configuration)
-        for key, value in (properties or {}).items():
+        for key, value in connection_properties.items():
             if not self._OPTION_KEY_RE.match(key):
                 raise ValueError(
                     f"Invalid property key: {key!r}. Keys must contain only alphanumeric characters and underscores."
@@ -254,6 +256,11 @@ class Catalog:
     def connection(self) -> duckdb.DuckDBPyConnection:
         """Access the underlying DuckDB connection."""
         return self._conn
+
+    @property
+    def append_profiler(self) -> AppendProfiler:
+        """Internal append-profiler configuration shared with catalog tables."""
+        return self._append_profiler
 
     # -- Namespace operations ------------------------------------------------
 

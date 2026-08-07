@@ -46,6 +46,7 @@ def test_append_profiling_logs_a_redacted_insert_profile(tmp_path: Path, caplog:
     assert event["catalog"] == "profile_catalog"
     assert event["table"] == "main.events"
     assert event["profile"]["latency"] >= 0
+    assert "DUCKLAKE_INSERT" in _operator_names(event["profile"])
     assert "query_name" not in json.dumps(event)
     assert "extra_info" not in json.dumps(event)
 
@@ -58,6 +59,23 @@ def test_append_profiling_is_off_by_default(tmp_path: Path, caplog: pytest.LogCa
         table.append(pa.table({"id": [1]}))
 
     assert not [record for record in caplog.records if record.name == "pyducklake.profiling"]
+
+
+@pytest.mark.duckdb15
+def test_append_profiling_preserves_caller_enabled_duckdb_profiling(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    catalog = _catalog(tmp_path, properties={"pyducklake_profile_append": "true"})
+    table = _table(catalog)
+    catalog.connection.execute("SET enable_profiling = 'no_output'")
+    catalog.connection.execute("SET profiling_coverage = 'ALL'")
+
+    with caplog.at_level(logging.WARNING, logger="pyducklake.profiling"):
+        table.append(pa.table({"id": [1]}))
+
+    assert catalog.connection.execute("SELECT current_setting('enable_profiling')").fetchone() == ("no_output",)
+    assert catalog.connection.execute("SELECT current_setting('profiling_coverage')").fetchone() == ("ALL",)
+    assert [record.message for record in caplog.records] == ["pyducklake_append_profile_skipped_existing_profile"]
 
 
 def test_append_profiling_property_must_be_boolean(tmp_path: Path) -> None:
@@ -102,6 +120,8 @@ def test_append_profile_partial_setup_is_disabled() -> None:
 
         def execute(self, sql: str) -> None:
             self.executed.append(sql)
+            if sql.startswith("SELECT current_setting"):
+                return _SettingsResult(None, "SELECT")  # type: ignore[return-value]
             if sql == "SET profiling_coverage = 'ALL'":
                 self.coverage_calls += 1
                 raise RuntimeError("coverage unavailable")
@@ -109,6 +129,7 @@ def test_append_profile_partial_setup_is_disabled() -> None:
     connection = PartiallyBrokenConnection()
     assert not AppendProfiler(enabled=True).start(connection)  # type: ignore[arg-type]
     assert connection.executed == [
+        "SELECT current_setting('enable_profiling'), current_setting('profiling_coverage')",
         "SET enable_profiling = 'no_output'",
         "SET profiling_coverage = 'ALL'",
         "PRAGMA disable_profiling",
@@ -123,11 +144,16 @@ def test_append_profile_failed_initial_setup_does_not_reset_existing_state() -> 
 
         def execute(self, sql: str) -> None:
             self.executed.append(sql)
+            if sql.startswith("SELECT current_setting"):
+                return _SettingsResult(None, "SELECT")  # type: ignore[return-value]
             raise RuntimeError("profiling unavailable")
 
     connection = InitiallyBrokenConnection()
     assert not AppendProfiler(enabled=True).start(connection)  # type: ignore[arg-type]
-    assert connection.executed == ["SET enable_profiling = 'no_output'"]
+    assert connection.executed == [
+        "SELECT current_setting('enable_profiling'), current_setting('profiling_coverage')",
+        "SET enable_profiling = 'no_output'",
+    ]
 
 
 @pytest.mark.duckdb15
@@ -142,3 +168,24 @@ def test_failed_append_does_not_log_a_success_profile(tmp_path: Path, caplog: py
 
     assert not [record for record in caplog.records if record.message.startswith("pyducklake_append_profile ")]
     assert catalog.connection.execute("SELECT current_setting('enable_profiling')").fetchone() == (None,)
+
+
+class _SettingsResult:
+    def __init__(self, enabled: str | None, coverage: str) -> None:
+        self._settings = (enabled, coverage)
+
+    def fetchone(self) -> tuple[str | None, str]:
+        return self._settings
+
+
+def _operator_names(profile: dict[str, object]) -> set[str]:
+    names: set[str] = set()
+    operator_name = profile.get("operator_name")
+    if isinstance(operator_name, str):
+        names.add(operator_name)
+    children = profile.get("children")
+    if isinstance(children, list):
+        for child in children:
+            if isinstance(child, dict):
+                names.update(_operator_names(child))
+    return names

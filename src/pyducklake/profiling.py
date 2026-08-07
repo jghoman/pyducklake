@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import Any, cast
 
 import duckdb
@@ -93,10 +94,19 @@ class AppendProfiler:
     def __init__(self, *, enabled: bool) -> None:
         self._enabled = enabled
 
-    def start(self, connection: duckdb.DuckDBPyConnection) -> bool:
+    def start(self, connection: duckdb.DuckDBPyConnection) -> _ProfileSession | None:
         """Enable in-memory profiling for the immediately following append query."""
         if not self._enabled:
-            return False
+            return None
+
+        session = _current_profile_session(connection)
+        if session is None:
+            _LOG.warning("pyducklake_append_profile_start_failed", exc_info=True)
+            return None
+        if session.enabled is not None:
+            _LOG.warning("pyducklake_append_profile_skipped_existing_profile")
+            return None
+
         profiling_enabled = False
         try:
             connection.execute("SET enable_profiling = 'no_output'")
@@ -104,10 +114,10 @@ class AppendProfiler:
             connection.execute("SET profiling_coverage = 'ALL'")
         except Exception:
             if profiling_enabled:
-                self.stop(connection)
+                self.stop(connection, session=session)
             _LOG.warning("pyducklake_append_profile_start_failed", exc_info=True)
-            return False
-        return True
+            return None
+        return session
 
     def capture(self, connection: duckdb.DuckDBPyConnection, *, catalog: str, table: str) -> None:
         """Log the current profile without masking a successful write."""
@@ -127,16 +137,39 @@ class AppendProfiler:
         except Exception:
             _LOG.warning("pyducklake_append_profile_capture_failed", exc_info=True)
 
-    def stop(self, connection: duckdb.DuckDBPyConnection) -> None:
+    def stop(self, connection: duckdb.DuckDBPyConnection, *, session: _ProfileSession) -> None:
         """Best-effort cleanup after a profile attempt."""
         try:
             connection.execute("PRAGMA disable_profiling")
         except Exception:
             _LOG.warning("pyducklake_append_profile_disable_failed", exc_info=True)
         try:
-            connection.execute("SET profiling_coverage = 'SELECT'")
+            connection.execute(f"SET profiling_coverage = '{session.coverage}'")
         except Exception:
             _LOG.warning("pyducklake_append_profile_coverage_reset_failed", exc_info=True)
+
+
+@dataclass(frozen=True)
+class _ProfileSession:
+    enabled: str | None
+    coverage: str
+
+
+def _current_profile_session(connection: duckdb.DuckDBPyConnection) -> _ProfileSession | None:
+    try:
+        row = connection.execute(
+            "SELECT current_setting('enable_profiling'), current_setting('profiling_coverage')"
+        ).fetchone()
+    except Exception:
+        return None
+    if row is None or len(row) != 2:
+        return None
+    enabled, coverage = row
+    if enabled is not None and not isinstance(enabled, str):
+        return None
+    if not isinstance(coverage, str):
+        return None
+    return _ProfileSession(enabled=enabled, coverage=coverage)
 
 
 def _parse_profile(raw_profile: Any) -> Mapping[str, Any] | None:

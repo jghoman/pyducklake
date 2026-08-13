@@ -228,11 +228,12 @@ def test_expire_snapshots_with_older_than(table: Table) -> None:
 
 
 def test_expire_snapshots_with_older_than_and_versions(table: Table) -> None:
-    """Both older_than and versions params together."""
+    """older_than and versions are mutually exclusive (ducklake rejects both together)."""
     table.append(_make_arrow_table([1], ["a"]))
     table.append(_make_arrow_table([2], ["b"]))
     table.append(_make_arrow_table([3], ["c"]))
-    table.maintenance().expire_snapshots(older_than="2099-01-01 00:00:00", versions=1)
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        table.maintenance().expire_snapshots(older_than="2099-01-01 00:00:00", versions=1)
     assert table.scan().count() == 3
 
 

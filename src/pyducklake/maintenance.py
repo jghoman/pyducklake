@@ -86,8 +86,15 @@ class MaintenanceTable:
             older_than: Timestamp string (``'YYYY-MM-DD HH:MM:SS'``).
             versions: Number of versions to keep.
             dry_run: If True, report what would be expired without acting.
+
+        Raises:
+            ValueError: If both ``older_than`` and ``versions`` are given;
+                ducklake accepts only one expiration criterion at a time.
         """
         from pyducklake.catalog import escape_string_literal
+
+        if older_than is not None and versions is not None:
+            raise ValueError("older_than and versions are mutually exclusive; specify only one expiration criterion.")
 
         catalog_name = self._table.catalog.name
         conn = self._table.catalog.connection

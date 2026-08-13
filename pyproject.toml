@@ -1,11 +1,11 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling==1.32.0"]
 build-backend = "hatchling.build"
 
 [project]
 name = "pyducklake"
 readme = "README.md"
-version = "1.0.16"
+version = "1.0.17"
 description = "A Python library for Ducklake, providing a pyiceberg-like API"
 license = "Apache-2.0"
 authors = [

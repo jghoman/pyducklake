@@ -344,13 +344,25 @@ class Table:
         order = self._sort_order_clause()
         conn = self._catalog.connection
         conn.register("_pyducklake_tmp_append", arrow_table)
+        profile_session = None
+        append_succeeded = False
         try:
             fqn = self.fully_qualified_name
+            profile_session = self._catalog.append_profiler.start(conn)
             if order:
                 conn.execute(f"INSERT INTO {fqn} SELECT * FROM _pyducklake_tmp_append ORDER BY {order}")
             else:
                 conn.execute(f"INSERT INTO {fqn} SELECT * FROM _pyducklake_tmp_append")
+            append_succeeded = True
         finally:
+            if profile_session is not None and append_succeeded:
+                self._catalog.append_profiler.capture(
+                    conn,
+                    catalog=self._catalog.name,
+                    table=f"{self.namespace}.{self.name}",
+                )
+            if profile_session is not None:
+                self._catalog.append_profiler.stop(conn, session=profile_session)
             conn.unregister("_pyducklake_tmp_append")
 
     def append_batches(

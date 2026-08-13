@@ -68,6 +68,28 @@ table.scan().count()                     # row count
 
 See [`examples/quickstart/`](examples/quickstart/) for the full runnable version.
 
+## Opt-in append profiles
+
+Set the catalog property `pyducklake_profile_append` to `"true"` to capture a
+DuckDB JSON profile for each `Table.append()` call. PyDuckLake enables
+in-memory profiling only around the INSERT, captures it before the temporary
+Arrow view is removed, and emits one redacted `pyducklake_append_profile` log
+event. The event contains fixed latency, memory, spill, and operator-timing
+fields, but excludes SQL and DuckDB `extra_info` fields.
+
+```python
+catalog = Catalog(
+    "my_lake",
+    "metadata.duckdb",
+    data_path="./data",
+    properties={"pyducklake_profile_append": "true"},
+)
+```
+
+The setting is per-catalog, so callers that create one catalog per destination
+can enable it for a single destination. It is intended for targeted diagnosis;
+do not combine it with DuckDB's own profiling settings.
+
 ## Comparison with pyiceberg
 
 pyducklake follows pyiceberg's API patterns where they make sense, but takes advantage of Ducklake's architecture (SQL metadata database vs file-based manifests) to provide features that are difficult or impossible in pyiceberg.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from unittest.mock import Mock, call
 
 import pytest
 
@@ -316,6 +317,76 @@ def test_context_manager(tmp_path: Path) -> None:
     with Catalog("ctx_cat", meta_db) as cat:
         assert cat.name == "ctx_cat"
     # Connection should be closed after exiting context
+
+
+# -- close(): DETACH-before-close -------------------------------------------
+
+
+def _catalog_with_mock_conn(name: str = "mock_cat") -> tuple[Catalog, Mock]:
+    """A Catalog whose DuckDB connection is a Mock (no real attach).
+
+    Deliberately bypasses __init__ (no duckdb connection, no ATTACH); only
+    the attributes close() touches (_name, _conn) are set.
+    """
+    cat = object.__new__(Catalog)
+    cat._name = name
+    cat._conn = Mock()
+    return cat, cat._conn
+
+
+def test_close_detaches_before_closing() -> None:
+    """close() must DETACH the ducklake attachment before closing the connection.
+
+    The ducklake extension frees its per-connection catalog state on DETACH;
+    conn.close() alone takes duckdb-core's instance-teardown path, which skips
+    that cleanup when the attached catalog carries conflict residue, orphaning
+    the allocation for the life of the process.
+    """
+    cat, conn = _catalog_with_mock_conn()
+    cat.close()
+    assert conn.mock_calls == [call.execute('DETACH "mock_cat"'), call.close()]
+
+
+def test_close_detach_quotes_identifier() -> None:
+    """Catalog names with embedded double-quotes are escaped by doubling them."""
+    cat, conn = _catalog_with_mock_conn('weird"name')
+    cat.close()
+    assert conn.mock_calls == [call.execute('DETACH "weird""name"'), call.close()]
+
+
+def test_close_tolerates_detach_failure() -> None:
+    """A failing DETACH (already detached, dead connection) must not prevent close()."""
+    cat, conn = _catalog_with_mock_conn()
+    conn.execute.side_effect = RuntimeError("connection already closed")
+    cat.close()
+    conn.close.assert_called_once_with()
+
+
+def test_double_close_tolerated() -> None:
+    """Second close() hits a dead connection: DETACH fails, close() still attempted."""
+    cat, conn = _catalog_with_mock_conn()
+    cat.close()
+    conn.execute.side_effect = RuntimeError("connection already closed")
+    cat.close()
+    assert conn.close.call_count == 2
+
+
+def test_detach_sql_valid_against_real_attachment(tmp_path: Path) -> None:
+    """The DETACH close() issues must be valid against a live ducklake attachment.
+
+    close() swallows DETACH failures, so without this test a malformed
+    statement (or a ducklake extension behavior change) would pass the suite
+    while the DETACH silently no-ops.
+    """
+    meta_db = str(tmp_path / "meta.duckdb")
+    cat = Catalog("detach_cat", meta_db)
+    # Same statement close() issues; must succeed against a live attachment.
+    cat.connection.execute('DETACH "detach_cat"')
+    # close() now hits the already-detached path: DETACH raises, is swallowed,
+    # and the connection still closes.
+    cat.close()
+    with pytest.raises(Exception):
+        cat.list_namespaces()
 
 
 # -- Nested types -----------------------------------------------------------

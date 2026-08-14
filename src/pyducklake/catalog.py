@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import TYPE_CHECKING, Any
 
@@ -57,6 +58,8 @@ from pyducklake.types import (
 from pyducklake.view import View
 
 __all__ = ["Catalog", "escape_string_literal", "quote_identifier"]
+
+_LOG = logging.getLogger(__name__)
 
 # Mapping from DuckDB type strings to DucklakeType constructors
 _DUCKDB_TYPE_MAP: dict[str, DucklakeType] = {
@@ -654,5 +657,19 @@ class Catalog:
         self.close()
 
     def close(self) -> None:
-        """Close the DuckDB connection."""
+        """Close the DuckDB connection.
+
+        Best-effort DETACH of the ducklake attachment first: the ducklake
+        extension frees its per-connection catalog state on DETACH, while
+        conn.close() alone takes duckdb-core's instance-teardown path, which
+        skips that cleanup when the attached catalog carries conflict residue
+        (a transaction aborted at COMMIT) — orphaning the allocation for the
+        life of the process. A failing DETACH (already detached, dead
+        connection, transaction with outstanding work) is logged and ignored;
+        close() below is the fallback.
+        """
+        try:
+            self._conn.execute(f"DETACH {quote_identifier(self._name)}")
+        except Exception:
+            _LOG.debug("pyducklake_detach_on_close_failed", exc_info=True)
         self._conn.close()

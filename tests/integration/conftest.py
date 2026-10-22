@@ -93,7 +93,7 @@ MINIO_SECRET_KEY = "minioadmin"
 def minio() -> Generator[MinioContainer, None, None]:
     """Spin up a MinIO container for the test module."""
     with MinioContainer(
-        image="minio/minio:latest",
+        image="cgr.dev/chainguard/minio:latest",
         access_key=MINIO_ACCESS_KEY,
         secret_key=MINIO_SECRET_KEY,
     ) as mc:

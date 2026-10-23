@@ -29,7 +29,7 @@ requires-python = ">=3.10"
 dependencies = [
     "click>=8.0,<9",
     "duckdb==1.5.6",
-    "pyarrow>=18.0,<26",
+    "pyarrow>=18.0,<27",
 ]
 
 [project.optional-dependencies]

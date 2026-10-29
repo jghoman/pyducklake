@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import UTC
 from pathlib import Path
 
 import pytest
@@ -177,9 +178,9 @@ def test_table_equality_different_namespace(catalog: Catalog, simple_schema: Sch
 
 def test_snapshot_fields() -> None:
     """Verify all Snapshot fields are accessible and defaults are correct."""
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    ts = datetime.now(tz=timezone.utc)
+    ts = datetime.now(tz=UTC)
     s = Snapshot(
         snapshot_id=42,
         timestamp=ts,
@@ -197,9 +198,9 @@ def test_snapshot_fields() -> None:
 
 
 def test_snapshot_defaults() -> None:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    ts = datetime.now(tz=timezone.utc)
+    ts = datetime.now(tz=UTC)
     s = Snapshot(snapshot_id=1, timestamp=ts)
     assert s.schema_version is None
     assert s.changes is None
@@ -208,9 +209,9 @@ def test_snapshot_defaults() -> None:
 
 
 def test_snapshot_immutable() -> None:
-    from datetime import datetime, timezone
+    from datetime import datetime
 
-    ts = datetime.now(tz=timezone.utc)
+    ts = datetime.now(tz=UTC)
     s = Snapshot(snapshot_id=1, timestamp=ts)
     with pytest.raises(AttributeError):
         s.snapshot_id = 2  # type: ignore[misc]

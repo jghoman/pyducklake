@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pyarrow as pa
@@ -176,7 +176,7 @@ def test_table_changes_mixed_bounds_raises(table: Table) -> None:
     with pytest.raises(ValueError, match="Cannot mix"):
         table.table_changes(
             start_snapshot=1,
-            end_time=datetime.now(tz=timezone.utc),
+            end_time=datetime.now(tz=UTC),
         )
 
 
@@ -623,7 +623,7 @@ def test_cdc_catalog_name_with_special_chars(tmp_path: Path) -> None:
 def test_table_changes_end_time_only_raises(table: Table) -> None:
     """Calling table_changes(end_time=ts) without start_time raises ValueError."""
     with pytest.raises(ValueError, match="start_time is required"):
-        table.table_changes(end_time=datetime.now(tz=timezone.utc))
+        table.table_changes(end_time=datetime.now(tz=UTC))
 
 
 def test_changeset_summary_on_insertions_raises(table: Table) -> None:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import UTC
 from pathlib import Path
 
 import pyarrow as pa
@@ -398,9 +399,9 @@ def test_inspect_files_with_snapshot_time(table: Table) -> None:
     table.append(_make_arrow_table([2], ["b"]))
 
     # Use a timestamp slightly in the future to ensure it captures current state
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
-    now = datetime.now(tz=timezone.utc) + timedelta(seconds=5)
+    now = datetime.now(tz=UTC) + timedelta(seconds=5)
     ts_str = now.strftime("%Y-%m-%d %H:%M:%S")
 
     result = table.inspect().files(snapshot_time=ts_str)

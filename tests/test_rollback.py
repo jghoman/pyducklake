@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pyarrow as pa
@@ -127,7 +127,7 @@ def test_rollback_to_timestamp(table: Table) -> None:
 def test_rollback_to_timestamp_before_any_data_raises(table: Table) -> None:
     """Timestamp before table creation raises ValueError."""
     table.append(_make_df([1], ["alice"]))
-    very_old = datetime(2000, 1, 1, tzinfo=timezone.utc)
+    very_old = datetime(2000, 1, 1, tzinfo=UTC)
     with pytest.raises(ValueError, match="No snapshot exists"):
         table.rollback_to_timestamp(very_old)
 
@@ -219,7 +219,7 @@ def test_rollback_to_timestamp_aware_ts(table: Table) -> None:
     table.append(_make_df([2], ["bob"]))
 
     # Use UTC-aware timestamp
-    aware_ts = snap.timestamp.replace(tzinfo=timezone.utc) if snap.timestamp.tzinfo is None else snap.timestamp
+    aware_ts = snap.timestamp.replace(tzinfo=UTC) if snap.timestamp.tzinfo is None else snap.timestamp
     table.rollback_to_timestamp(aware_ts)
     result = table.scan().to_arrow()
     assert result.num_rows == 1

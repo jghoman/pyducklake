@@ -27,7 +27,7 @@ classifiers = [
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.0,<9",
-    "duckdb==1.5.6",
+    "duckdb==2.0.0",
     "pyarrow>=18.0,<27",
 ]
 
